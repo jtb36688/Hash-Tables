@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->storage = calloc(capacity, sizeof(Pair *));
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -84,7 +86,18 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+int index = hash(key, ht->capacity);
+Pair *pair = create_pair(key, value);
 
+Pair *stored_pair = ht->storage[index];
+
+if(stored_pair != NULL) {
+  if(strcmp(key, stored_pair->key) != 0) {
+    printf("WARNING: overwriting value '%s' '/%s' with '%s' '/%s'",
+    stored_pair->key, stored_pair->value, pair->key, pair->value);
+  }
+
+}
 }
 
 /****
@@ -94,7 +107,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
 
+  if(ht->storage[index] == NULL || strcmp(ht->storage[index]->key, key) != 0)
+  {
+    fprint()
+  }
 }
 
 /****

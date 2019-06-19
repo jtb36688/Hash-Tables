@@ -17,7 +17,7 @@ Hash functions map data of an arbitrary size to data of a fixed size. For exampl
 `"foo"` -> `10`
 
 `"bar"` -> `12`
-
+s
 `"baz"` -> `5`
 
 `"Hello world!"` -> `6`
