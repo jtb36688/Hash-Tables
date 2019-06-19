@@ -98,17 +98,12 @@ Pair *stored_pair = ht->storage[index];
 if(stored_pair != NULL) {
   if(strcmp(key, stored_pair->key) != 0) {
     // If the provided key is NOT the same as the key on the resulting hashed index.
-    printf("WARNING: overwriting value '%s' '/%s' with '%s' '/%s'",
+    printf("WARNING: overwriting value '%s' '/%s' with '%s' '/%s'\n",
     stored_pair->key, stored_pair->value, pair->key, pair->value);
   }
-  free(ht->storage[index]);
+  destroy_pair(stored_pair);
 }
-
-free(stored_pair);
 ht->storage[index] = pair;
-
-
-
 }
 
 /****
@@ -122,8 +117,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 
   if(ht->storage[index] == NULL || strcmp(ht->storage[index]->key, key) != 0)
   {
-    fprint()
+    fprint("Hash table does not contain provided key\n");
+    return;
   }
+  destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
+  // set hash table index to be NULL, as all others are through calloc()
 }
 
 /****
