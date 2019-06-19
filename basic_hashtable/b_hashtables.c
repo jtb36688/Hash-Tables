@@ -116,6 +116,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   int index = hash(key, ht->capacity);
 
   if(ht->storage[index] == NULL || strcmp(ht->storage[index]->key, key) != 0)
+  // return; If the element at hashed index is NULL, OR if the
+  // contained key is not the same as the provided key.
   {
     fprint("Hash table does not contain provided key\n");
     return;
@@ -132,6 +134,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL || strcmp(ht->storage[index]->key, key) == 0) {
+    // return element; If the element at hashed index is not NULL, AND if the
+    // contained key is the same as the provided key. 
+    return ht->storage[index];
+  }
   return NULL;
 }
 
