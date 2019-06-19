@@ -101,7 +101,12 @@ if(stored_pair != NULL) {
     printf("WARNING: overwriting value '%s' '/%s' with '%s' '/%s'",
     stored_pair->key, stored_pair->value, pair->key, pair->value);
   }
+  free(ht->storage[index]);
 }
+
+free(stored_pair);
+ht->storage[index] = pair;
+
 
 
 }
