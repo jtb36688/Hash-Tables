@@ -172,7 +172,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         // node. Else, set the next node as the current node and repeat.
         if (current_node->next == NULL) {
           LinkedPair *pair = create_pair(key, value);
-          current_node->next == pair;
+          current_node->next = pair;
           found = true;
         }
         current_node = current_node->next;
@@ -212,9 +212,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   int index = hash(key, ht->capacity);
 
   if (ht->storage[index] != NULL) {
-    // If linked list exists at hash index, store the list and head node in variables
-    LinkedList *stored_list = ht->storage[index];
-    LinkedPair *current_node = stored_list->head;
+    LinkedPair *current_node = ht->storage[index];
     while (current_node != NULL) {
       // Looping through all linked list nodes until we arrive at NULL
       if(strcmp(key, current_node->key) == 0) {
