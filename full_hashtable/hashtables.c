@@ -23,6 +23,38 @@ typedef struct HashTable {
   LinkedPair **storage;
 } HashTable;
 
+/*  
+Singly Linked List
+stores a pointer to the head and the tail
+the size of the list
+*/
+
+typedef struct LinkedList
+{
+    ListNode *head;
+    ListNode *tail;
+    int size;
+} LinkedList;
+
+// constructor function for linked list
+
+LinkedList *create_list(void)
+{
+    LinkedList *ll = malloc(sizeof(LinkedList));
+    ll->head = NULL;
+    ll->tail = NULL;
+    ll->size = 0;
+
+    return ll;
+}
+
+// destructor function for linked list
+
+void free_list(LinkedList *ll)
+{
+    free(ll);
+}
+
 /*
   Create a key/value linked pair to be stored in the hash table.
  */
@@ -94,16 +126,50 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 int index = hash(key, ht->capacity);
 // Index integer which is created by hashing the provided key argument
 
-Pair *pair = create_pair(key, value);
-// Creating a key/value pair using the Pair struct and provided key/value
+LinkedPair *pair = create_pair(key, value);
+// Creating a key/value pair using the LinkedPair struct and provided key/value
 
-Pair *stored_pair = ht->storage[index];
-// Creating a key/value pair using the Pair struct and an existing pointer in the hashtable 
+
+if (ht->storage[index] == NULL) {
+  LinkedList *new_ll = create_list();
+  new_ll->head = pair;
+  new_ll->tail = pair;
+  new_ll->size = 1;
+  stored_list = new_ll;
+  printf("New stored list created at index %d", index);
+  return;
+}
+
+LinkedList *stored_list = ht->storage[index];
+// creating variable representing the LinkedList stored at index, which must
+// be present because ht->storage[index] is not null following last conditional
+
+LinkedPair *current_node = stored_list->head;
+// creating variable representing the head node of concerned LinkedList.
+
+while (current_node != NULL) {
+  // Will loop over each item in the LinkedList at hash index
+  if(strcmp(key, current_node->key) == 0)  {
+    // IF the provided key is the same as the current_node's key, overwrite
+    // current_node with a node created from the provided pair.
+    if (current_node->next) {
+      pair->next = current_node->next;
+    }
+    if (stored_list->head == current_node) {
+      stored_list-> head == pair;
+    }
+    destroy_pair(stored_pair);
+    printf("Overwriting item with %s, stored in LL at index %d", key, index);
+    }
+    
+    // IF provided key is the same as the key in the LinkedList node
+  }
+}
 
 if(stored_pair != NULL) {
   if(strcmp(key, stored_pair->key) != 0) {
     // If the provided key is NOT the same as the key on the resulting hashed index.
-    printf("WARNING: overwriting value '%s' '/%s' with '%s' '/%s'\n",
+    printf("Collision on insert: Unmatched Key %s. Adding to linked list", key)
     stored_pair->key, stored_pair->value, pair->key, pair->value);
   }
   destroy_pair(stored_pair);
