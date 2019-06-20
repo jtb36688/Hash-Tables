@@ -205,6 +205,21 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL) {
+    LinkedList *stored_list = ht->storage[index];
+    LinkedPair *current_node = stored_list->head;
+    while (current_node != NULL) {
+      // Looping through all linked list nodes until we arrive at NULL
+      if(strcmp(key, current_node->key) == 0) {
+        // If the node's key matches the provided key, return the node's value.
+        return current_node->value;
+      }
+      // Repeat loop with the next node
+      current_node = current_node->next;
+    }
+  }
   return NULL;
 }
 
