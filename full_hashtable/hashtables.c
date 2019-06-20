@@ -269,6 +269,22 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 void destroy_hash_table(HashTable *ht)
 {
 
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i]) {
+      // If there is a node at hashed index, create a variable
+      // which represents the next node.
+      LinkedPair *nextnode = ht->storage[i]->next;
+      destroy_pair(ht->storage[i]);
+      while (nextnode) {
+        LinkedPair *currentnode = nextnode;
+        LinkedPair *nextnode = currentnode->next;
+        destroy_pair(currentnode);
+      }
+    }
+  }
+  free(ht->storage);
+  free(ht);
+
 }
 
 /*
