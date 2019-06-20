@@ -91,7 +91,24 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+int index = hash(key, ht->capacity);
+// Index integer which is created by hashing the provided key argument
 
+Pair *pair = create_pair(key, value);
+// Creating a key/value pair using the Pair struct and provided key/value
+
+Pair *stored_pair = ht->storage[index];
+// Creating a key/value pair using the Pair struct and an existing pointer in the hashtable 
+
+if(stored_pair != NULL) {
+  if(strcmp(key, stored_pair->key) != 0) {
+    // If the provided key is NOT the same as the key on the resulting hashed index.
+    printf("WARNING: overwriting value '%s' '/%s' with '%s' '/%s'\n",
+    stored_pair->key, stored_pair->value, pair->key, pair->value);
+  }
+  destroy_pair(stored_pair);
+}
+ht->storage[index] = pair;
 }
 
 /*
