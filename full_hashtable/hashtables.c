@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 /*
   Hash table key/value pair with linked list pointer.
@@ -123,7 +124,7 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-int index = hash(key, ht->capacity);
+  int index = hash(key, ht->capacity);
 // Index integer which is created by hashing the provided key argument
 
 // LinkedPair *pair = create_pair(key, value);
@@ -147,17 +148,41 @@ int index = hash(key, ht->capacity);
 // // be present because ht->storage[index] is not null following last conditional
 
 // LinkedPair *current_node = stored_list->head;
-// // creating variable representing the head node of concerned LinkedList.
+// creating variable representing the head node of concerned LinkedList.
 
 // LinkedPair *prev = NULL;
 // // creating variable representing previous node
 
-if (ht->storage[index] != NULL) {
-  if(strcmp(key, ht->storage[index]->key) == 0)  {
-    // IF the provided key is the same as the current_node's key, overwrite
-    // current_node's value with provided value.
-    printf("Overwriting item with %s, stored in LL at index %d", key, index);
-    ht->storage[index]->value = value;
+  if (ht->storage[index] != NULL) {
+    // If there is a linked list at hashed index (not NULL), create
+    // a variable representing the first node there.
+    LinkedPair *current_node = ht->storage[index];
+    bool found = false;
+    while (!found) {
+      if (strcmp(key, current_node->key) == 0) {
+        // IF the provided key is the same as the current_node's key, overwrite
+        // current_node's value with provided value.
+        printf("Overwriting item with %s, stored in LL at index %d", key, index);
+        current_node->value = value;
+        found = true;
+      }
+      else {
+        // If the key is not the same as current_node's key, first check
+        // if the next node is NULL. If so, create a pair and add as the next
+        // node. Else, set the next node as the current node and repeat.
+        if (current_node->next == NULL) {
+          LinkedPair *pair = create_pair(key, value);
+          current_node->next == pair;
+          found = true;
+        }
+        current_node = current_node->next;
+      }
+    }
+  }
+  else {
+    // If the bucket at hash index is empty, create a node
+    LinkedPair *pair = create_pair(key, value);
+    ht->storage[index] = pair;
   }
 }
 
