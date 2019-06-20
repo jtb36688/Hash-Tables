@@ -29,31 +29,31 @@ stores a pointer to the head and the tail
 the size of the list
 */
 
-typedef struct LinkedList
-{
-    ListNode *head;
-    ListNode *tail;
-    int size;
-} LinkedList;
+// typedef struct LinkedList
+// {
+//     LinkedPair *head;
+//     LinkedPair *tail;
+//     int size;
+// } LinkedList;
 
-// constructor function for linked list
+// // constructor function for linked list
 
-LinkedList *create_list(void)
-{
-    LinkedList *ll = malloc(sizeof(LinkedList));
-    ll->head = NULL;
-    ll->tail = NULL;
-    ll->size = 0;
+// LinkedList *create_list(void)
+// {
+//     LinkedList *ll = malloc(sizeof(LinkedList));
+//     ll->head = NULL;
+//     ll->tail = NULL;
+//     ll->size = 0;
 
-    return ll;
-}
+//     return ll;
+// }
 
-// destructor function for linked list
+// // destructor function for linked list
 
-void free_list(LinkedList *ll)
-{
-    free(ll);
-}
+// void free_list(LinkedList *ll)
+// {
+//     free(ll);
+// }
 
 /*
   Create a key/value linked pair to be stored in the hash table.
@@ -105,8 +105,8 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht = malloc(sizeof(BasicHashTable));
-  ht->storage = calloc(capacity, sizeof(Pair *));
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   ht->capacity = capacity;
 
   return ht;
@@ -126,59 +126,38 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 int index = hash(key, ht->capacity);
 // Index integer which is created by hashing the provided key argument
 
-LinkedPair *pair = create_pair(key, value);
-// Creating a key/value pair using the LinkedPair struct and provided key/value
+// LinkedPair *pair = create_pair(key, value);
+// // Creating a key/value pair using the LinkedPair struct and provided key/value
 
 
-if (ht->storage[index] == NULL) {
-  // if there is no LinkedList at hash table at index, create one and
-  // make its head and tail equal to the provided pair, then return.
-  LinkedList *new_ll = create_list();
-  new_ll->head = pair;
-  new_ll->tail = pair;
-  new_ll->size = 1;
-  stored_list = new_ll;
-  printf("New stored list created at index %d", index);
-  return;
-}
+// if (ht->storage[index] == NULL) {
+//   // if there is no LinkedList at hash table at index, create one and
+//   // make its head and tail equal to the provided pair, then return.
+//   LinkedList *new_ll = create_list();
+//   new_ll->head = pair;
+//   new_ll->tail = pair;
+//   new_ll->size = 1;
+//   ht->storage[index] = new_ll;
+//   printf("New stored list created at index %d", index);
+//   return;
+// }
 
-LinkedList *stored_list = ht->storage[index];
-// creating variable representing the LinkedList stored at index, which must
-// be present because ht->storage[index] is not null following last conditional
+// LinkedList *stored_list = ht->storage[index];
+// // creating variable representing the LinkedList stored at index, which must
+// // be present because ht->storage[index] is not null following last conditional
 
-LinkedPair *current_node = stored_list->head;
-// creating variable representing the head node of concerned LinkedList.
+// LinkedPair *current_node = stored_list->head;
+// // creating variable representing the head node of concerned LinkedList.
 
-while (current_node != NULL) {
-  // Will loop over each item in the LinkedList at hash index
-  if(strcmp(key, current_node->key) == 0)  {
+// LinkedPair *prev = NULL;
+// // creating variable representing previous node
+
+if (ht->storage[index] != NULL) {
+  if(strcmp(key, ht->storage[index]->key) == 0)  {
     // IF the provided key is the same as the current_node's key, overwrite
-    // current_node with a node created from the provided pair.
+    // current_node's value with provided value.
     printf("Overwriting item with %s, stored in LL at index %d", key, index);
-    if (current_node->next) {
-      pair->next = current_node->next;
-    }
-
-    if (stored_list->head == current_node) {
-      stored_list->head == pair;
-    }
-
-    if (stored_list->tail == current_node) {
-      stored_list->tail == pair;
-    }
-
-    destroy_pair(stored_pair);
-
-    if (prev) {
-      prev->next == pair;
-    }
-
-    return;
-    }
-
-    PairedList *prev = current_node;
-    current_node = current_node->next;
-    // repeat loop with next node and a pointer to the previous one.
+    ht->storage[index]->value = value;
   }
 }
 
@@ -208,6 +187,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   int index = hash(key, ht->capacity);
 
   if (ht->storage[index] != NULL) {
+    // If linked list exists at hash index, store the list and head node in variables
     LinkedList *stored_list = ht->storage[index];
     LinkedPair *current_node = stored_list->head;
     while (current_node != NULL) {
@@ -262,13 +242,13 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
