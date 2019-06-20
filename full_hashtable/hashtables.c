@@ -131,6 +131,8 @@ LinkedPair *pair = create_pair(key, value);
 
 
 if (ht->storage[index] == NULL) {
+  // if there is no LinkedList at hash table at index, create one and
+  // make its head and tail equal to the provided pair, then return.
   LinkedList *new_ll = create_list();
   new_ll->head = pair;
   new_ll->tail = pair;
@@ -152,29 +154,32 @@ while (current_node != NULL) {
   if(strcmp(key, current_node->key) == 0)  {
     // IF the provided key is the same as the current_node's key, overwrite
     // current_node with a node created from the provided pair.
+    printf("Overwriting item with %s, stored in LL at index %d", key, index);
     if (current_node->next) {
       pair->next = current_node->next;
     }
-    if (stored_list->head == current_node) {
-      stored_list-> head == pair;
-    }
-    destroy_pair(stored_pair);
-    printf("Overwriting item with %s, stored in LL at index %d", key, index);
-    }
-    
-    // IF provided key is the same as the key in the LinkedList node
-  }
-}
 
-if(stored_pair != NULL) {
-  if(strcmp(key, stored_pair->key) != 0) {
-    // If the provided key is NOT the same as the key on the resulting hashed index.
-    printf("Collision on insert: Unmatched Key %s. Adding to linked list", key)
-    stored_pair->key, stored_pair->value, pair->key, pair->value);
+    if (stored_list->head == current_node) {
+      stored_list->head == pair;
+    }
+
+    if (stored_list->tail == current_node) {
+      stored_list->tail == pair;
+    }
+
+    destroy_pair(stored_pair);
+
+    if (prev) {
+      prev->next == pair;
+    }
+
+    return;
+    }
+
+    PairedList *prev = current_node;
+    current_node = current_node->next;
+    // repeat loop with next node and a pointer to the previous one.
   }
-  destroy_pair(stored_pair);
-}
-ht->storage[index] = pair;
 }
 
 /*
