@@ -162,7 +162,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       if (strcmp(key, current_node->key) == 0) {
         // IF the provided key is the same as the current_node's key, overwrite
         // current_node's value with provided value.
-        printf("Overwriting item with %s, stored in LL at index %d", key, index);
+        printf("Overwriting item with %s, stored in LL at index %d\n", key, index);
         current_node->value = value;
         found = true;
       }
@@ -219,7 +219,7 @@ void hash_table_remove(HashTable *ht, char *key) {
         else {
           // If there is no next node, return warning.
           if (!current_node->next) {
-            printf("hash_table_remove: no key found matching %s", key);
+            printf("hash_table_remove: no key found matching %s\n", key);
             break;
           }
           // If there is a next node, change current node to that and repeat loop.
@@ -229,7 +229,7 @@ void hash_table_remove(HashTable *ht, char *key) {
     }
     else {
       // If there is not a node at hashed index, return warning.
-      printf("hash_table_remove: no key found matching %s", key);
+      printf("hash_table_remove: no key found matching %s\n", key);
     }
 }
 
@@ -273,12 +273,15 @@ void destroy_hash_table(HashTable *ht)
     if (ht->storage[i]) {
       // If there is a node at hashed index, create a variable
       // which represents the next node.
-      LinkedPair *nextnode = ht->storage[i]->next;
-      destroy_pair(ht->storage[i]);
-      while (nextnode) {
-        LinkedPair *currentnode = nextnode;
-        LinkedPair *nextnode = currentnode->next;
-        destroy_pair(currentnode);
+      LinkedPair *curr = ht->storage[i]->next;
+      if (curr) {
+        // If there are are following nodes, assign a temp variable
+        // representing the next node's following node, and then run loop.
+      LinkedPair *nextnode = curr->next;
+        while (curr) {
+          destroy_pair(curr);
+          curr = nextnode;
+        }
       }
     }
   }
@@ -297,12 +300,12 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
+  printf("\nStarted Resizing Table\n");
   HashTable *new_ht = malloc(sizeof(HashTable));
   new_ht->capacity = ht->capacity*2;
   new_ht->storage = calloc(ht->capacity*2, sizeof(LinkedPair *));
   // use calloc to allocate memory for twice the capacity of the original
   // hash table and for sizeof a linkedpair struct
-
   for (int i = 0; i < ht->capacity; i++) {
     if (ht->storage[i]) {
       hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
@@ -317,7 +320,7 @@ HashTable *hash_table_resize(HashTable *ht)
       }
     }
   }
-
+  printf("\nFinished Resizing Table\n");
   destroy_hash_table(ht);
   return new_ht;
 }
