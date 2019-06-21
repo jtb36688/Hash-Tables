@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 /*
   Hash table key/value pair with linked list pointer.
@@ -22,6 +23,38 @@ typedef struct HashTable {
   int capacity;
   LinkedPair **storage;
 } HashTable;
+
+/*  
+Singly Linked List
+stores a pointer to the head and the tail
+the size of the list
+*/
+
+// typedef struct LinkedList
+// {
+//     LinkedPair *head;
+//     LinkedPair *tail;
+//     int size;
+// } LinkedList;
+
+// // constructor function for linked list
+
+// LinkedList *create_list(void)
+// {
+//     LinkedList *ll = malloc(sizeof(LinkedList));
+//     ll->head = NULL;
+//     ll->tail = NULL;
+//     ll->size = 0;
+
+//     return ll;
+// }
+
+// // destructor function for linked list
+
+// void free_list(LinkedList *ll)
+// {
+//     free(ll);
+// }
 
 /*
   Create a key/value linked pair to be stored in the hash table.
@@ -73,7 +106,9 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -89,7 +124,66 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int index = hash(key, ht->capacity);
+// Index integer which is created by hashing the provided key argument
 
+// LinkedPair *pair = create_pair(key, value);
+// // Creating a key/value pair using the LinkedPair struct and provided key/value
+
+
+// if (ht->storage[index] == NULL) {
+//   // if there is no LinkedList at hash table at index, create one and
+//   // make its head and tail equal to the provided pair, then return.
+//   LinkedList *new_ll = create_list();
+//   new_ll->head = pair;
+//   new_ll->tail = pair;
+//   new_ll->size = 1;
+//   ht->storage[index] = new_ll;
+//   printf("New stored list created at index %d", index);
+//   return;
+// }
+
+// LinkedList *stored_list = ht->storage[index];
+// // creating variable representing the LinkedList stored at index, which must
+// // be present because ht->storage[index] is not null following last conditional
+
+// LinkedPair *current_node = stored_list->head;
+// creating variable representing the head node of concerned LinkedList.
+
+// LinkedPair *prev = NULL;
+// // creating variable representing previous node
+
+  if (ht->storage[index] != NULL) {
+    // If there is a linked list at hashed index (not NULL), create
+    // a variable representing the first node there.
+    LinkedPair *current_node = ht->storage[index];
+    bool found = false;
+    while (!found) {
+      if (strcmp(key, current_node->key) == 0) {
+        // IF the provided key is the same as the current_node's key, overwrite
+        // current_node's value with provided value.
+        printf("Overwriting item with %s, stored in LL at index %d\n", key, index);
+        current_node->value = value;
+        found = true;
+      }
+      else {
+        // If the key is not the same as current_node's key, first check
+        // if the next node is NULL. If so, create a pair and add as the next
+        // node. Else, set the next node as the current node and repeat.
+        if (current_node->next == NULL) {
+          LinkedPair *pair = create_pair(key, value);
+          current_node->next = pair;
+          found = true;
+        }
+        current_node = current_node->next;
+      }
+    }
+  }
+  else {
+    // If the bucket at hash index is empty, create a node
+    LinkedPair *pair = create_pair(key, value);
+    ht->storage[index] = pair;
+  }
 }
 
 /*
@@ -100,10 +194,45 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  */
-void hash_table_remove(HashTable *ht, char *key)
-{
+void hash_table_remove(HashTable *ht, char *key) {
+  int index = hash(key, ht->capacity);
 
+  if (ht->storage[index]) {
+    LinkedPair *current_node = ht->storage[index];
+    // make variable representing the first node at hashed index
+    bool found = false;
+    while (!found) {
+      if (current_node == ht->storage[index] && strcmp(key, current_node->key) == 0) {
+        // If found on first node, assign index to the next node and destroy first node. End loop.
+          ht->storage[index] = current_node->next;
+          destroy_pair(current_node);
+          found = true;
+        }
+        else if (current_node->next && strcmp(key, current_node->next->key) == 0) {
+        // If the next node is the matching key, assign current node's next to two nodes past,
+        // then destroy the next node. End loop.
+          LinkedPair *found_node = current_node->next;
+          current_node->next = current_node->next->next;
+          destroy_pair(found_node);
+          found = true;
+        }
+        else {
+          // If there is no next node, return warning.
+          if (!current_node->next) {
+            printf("hash_table_remove: no key found matching %s\n", key);
+            break;
+          }
+          // If there is a next node, change current node to that and repeat loop.
+          current_node = current_node->next;
+        }
+      }
+    }
+    else {
+      // If there is not a node at hashed index, return warning.
+      printf("hash_table_remove: no key found matching %s\n", key);
+    }
 }
+
 
 /*
   Fill this in.
@@ -115,6 +244,20 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL) {
+    LinkedPair *current_node = ht->storage[index];
+    while (current_node != NULL) {
+      // Looping through all linked list nodes until we arrive at NULL
+      if(strcmp(key, current_node->key) == 0) {
+        // If the node's key matches the provided key, return the node's value.
+        return current_node->value;
+      }
+      // Repeat loop with the next node
+      current_node = current_node->next;
+    }
+  }
   return NULL;
 }
 
@@ -125,6 +268,25 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  */
 void destroy_hash_table(HashTable *ht)
 {
+
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i]) {
+      // If there is a node at hashed index, create a variable
+      // which represents the next node.
+      LinkedPair *curr = ht->storage[i]->next;
+      if (curr) {
+        // If there are are following nodes, assign a temp variable
+        // representing the next node's following node, and then run loop.
+      LinkedPair *nextnode = curr->next;
+        while (curr) {
+          destroy_pair(curr);
+          curr = nextnode;
+        }
+      }
+    }
+  }
+  free(ht->storage);
+  free(ht);
 
 }
 
@@ -138,8 +300,28 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  printf("\nStarted Resizing Table\n");
+  HashTable *new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = ht->capacity*2;
+  new_ht->storage = calloc(ht->capacity*2, sizeof(LinkedPair *));
+  // use calloc to allocate memory for twice the capacity of the original
+  // hash table and for sizeof a linkedpair struct
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i]) {
+      hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
+      // insert each key/value from original ht to new ht as LinkedPairs
+      // use the insert method to do this, which creates LinkedPairs
+      LinkedPair *currentnode = ht->storage[i]->next;
+      while (currentnode) {
+        // If there is a truthy value for each node at the index,
+        // loop through each one and insert it into the same index on the new hash table
+        hash_table_insert(new_ht, currentnode->key, currentnode->value);
+        currentnode = currentnode->next;
+      }
+    }
+  }
+  printf("\nFinished Resizing Table\n");
+  destroy_hash_table(ht);
   return new_ht;
 }
 

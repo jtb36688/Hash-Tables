@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->storage = calloc(capacity, sizeof(Pair *));
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -84,7 +86,24 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+int index = hash(key, ht->capacity);
+// Index integer which is created by hashing the provided key argument
 
+Pair *pair = create_pair(key, value);
+// Creating a key/value pair using the Pair struct and provided key/value
+
+Pair *stored_pair = ht->storage[index];
+// Creating a key/value pair using the Pair struct and an existing pointer in the hashtable 
+
+if(stored_pair != NULL) {
+  if(strcmp(key, stored_pair->key) != 0) {
+    // If the provided key is NOT the same as the key on the resulting hashed index.
+    printf("WARNING: overwriting value '%s' '/%s' with '%s' '/%s'\n",
+    stored_pair->key, stored_pair->value, pair->key, pair->value);
+  }
+  destroy_pair(stored_pair);
+}
+ht->storage[index] = pair;
 }
 
 /****
@@ -94,7 +113,18 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
 
+  if(ht->storage[index] == NULL || strcmp(ht->storage[index]->key, key) != 0)
+  // return; If the element at hashed index is NULL, OR if the
+  // contained key is not the same as the provided key.
+  {
+    printf("Hash table does not contain provided key\n");
+    return;
+  }
+  destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
+  // set hash table index to be NULL, as all others are through calloc()
 }
 
 /****
@@ -104,6 +134,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL && strcmp(ht->storage[index]->key, key) == 0) {
+    // return element; If the element at hashed index is not NULL, AND if the
+    // contained key is the same as the provided key. 
+    return ht->storage[index]->value;
+  }
   return NULL;
 }
 
@@ -114,7 +151,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+for (int i = 0; i < ht->capacity; i++) {
+  destroy_pair(ht->storage[i]);
+  // Free the memory for each individual element
+}
+free(ht->storage);
+// Free the memory for the array of elements
+free(ht);
+// Free the memory for the ht struct
 }
 
 
