@@ -297,8 +297,28 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = ht->capacity*2;
+  new_ht->storage = calloc(ht->capacity*2, sizeof(LinkedPair *));
+  // use calloc to allocate memory for twice the capacity of the original
+  // hash table and for sizeof a linkedpair struct
 
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i]) {
+      hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
+      // insert each key/value from original ht to new ht as LinkedPairs
+      // use the insert method to do this, which creates LinkedPairs
+      LinkedPair *currentnode = ht->storage[i]->next;
+      while (currentnode) {
+        // If there is a truthy value for each node at the index,
+        // loop through each one and insert it into the same index on the new hash table
+        hash_table_insert(new_ht, currentnode->key, currentnode->value);
+        currentnode = currentnode->next;
+      }
+    }
+  }
+
+  destroy_hash_table(ht);
   return new_ht;
 }
 
